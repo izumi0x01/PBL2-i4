@@ -1,249 +1,155 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
- 
+
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 
 #define SERVOMIN 135    // this is the 'minimum' pulse length count (out of 4096)
 #define SERVOMAX 430    // this is the 'maximum' pulse length count (out of 4096)
 
 #define map_angle(angle) map(angle, 0, 165, SERVOMIN, SERVOMAX)
-//#define map_angle(angle) map(angle, 0, 165, SERVOMIN, SERVOMAX)
-//#define map_angle(angle) map(angle, 0, 165, SERVOMIN, SERVOMAX)
-//#define map_angle(angle) map(angle, 0, 165, SERVOMIN, SERVOMAX)
 
 typedef enum {
 
   //left front leg
-  servo_left_front_leg3 = 0,
-  servo_left_front_leg2 = 1,
-  servo_left_front_leg1 = 2,
+  legLF3_pin = 0,
+  legLF2_pin = 1,
+  legLF1_pin = 2,
 
   //left back leg
-  servo_left_back_leg = 4,
+  legLB_pin = 4,
   
   //right back leg
-  servo_right_back_leg = 8,
+  legRB_pin = 8,
   
   //right front leg
-  servo_right_front_leg3 = 12,
-  servo_right_front_leg2 = 13,
-  servo_right_front_leg1 = 14,
+  legRF3_pin = 12,
+  legRF2_pin = 13,
+  legRF1_pin = 14,
   
-}servo_name;
+}servo_pin_num;
+
+struct front_leg1_servo_angles {
+  int straight;
+  int lowerstraight;
+  int middle;
+  int lowerside;
+  int side;
+  int beyond_side;
+};
+
+struct front_leg2_servo_angles {
+  int upper_limit;
+  int upward_vertical;
+  int beyond_upward_vertical;
+  int horizontal;
+  int beyond_horizontal;
+};
+
+struct front_leg3_servo_angles {
+  int max_stretch;
+  int grounding;
+  int downward_vertical;
+  int beyond_downward_vertical;
+};
+
+struct back_leg_servo_angles {
+  int backward_grounding;
+  int horizontal;
+  int diagonal; 
+  int frontward_grounding;
+  int beyond_frontward_vertical;
+};
+
+front_leg1_servo_angles legLF1_angle  ={15, 45, 60, 75, 105, 150};
+front_leg1_servo_angles legRF1_angle  ={150, 120, 105, 90, 60, 15};
+
+front_leg2_servo_angles legLF2_angle  ={0, 45, 75, 135, 150};
+front_leg2_servo_angles legRF2_angle  ={0, 45, 75, 135, 150};
+
+front_leg3_servo_angles legLF3_angle  ={0, 90, 158, 165};
+front_leg3_servo_angles legRF3_angle  ={0, 90, 158, 165};
+
+back_leg_servo_angles legLB_angle  ={0, 65, 80, 155, 165};//default
+back_leg_servo_angles legRB_angle  ={165, 100, 85, 10, 0};
+
 
 void setup() {
   
-  // put your setup code here, to run once:
     pwm.begin();
     pwm.setPWMFreq(50);  // analog servos run at 50Hz updates
 
-    //initialize servo angle
-
-
-//前左脚
-      pwm.setPWM(servo_left_front_leg3, 0, map_angle(160));
-      pwm.setPWM(servo_left_front_leg2, 0, map_angle(10));
-      pwm.setPWM(servo_left_front_leg1, 0, map_angle(15));//default
-      //pwm.setPWM(servo_left_front_leg1, 0, map_angle(60));//turn right 90 degree
-
-//後ろ右脚
-     pwm.setPWM(servo_right_back_leg3, 0, map_angle(160));
-     pwm.setPWM(servo_right_back_leg2, 0, map_angle(10));
-     pwm.setPWM(servo_right_back_leg1, 0, map_angle(15));//default
-     //pwm.setPWM(servo_right_back_leg1, 0, map_angle(105));//turn left 90 degree
-
-//後ろ左脚
-     pwm.setPWM(servo_left_back_leg3, 0, map_angle(160));
-     pwm.setPWM(servo_left_back_leg2, 0, map_angle(10));
-     pwm.setPWM(servo_left_back_leg1, 0, map_angle(150));
-
-//前右脚
-     pwm.setPWM(servo_right_front_leg3, 0, map_angle(160));
-     pwm.setPWM(servo_right_front_leg2, 0, map_angle(10));
-     pwm.setPWM(servo_right_front_leg1, 0, map_angle(150));
+    //if you want to set servo degree to zero , comment out here.
+    //initialize_servo_degree();
 
 }
-
-     //後ろ左脚、前左足
-     //pwm.setPWM(servo_left_front_leg1, 0, map_angle(150));//default
-     //pwm.setPWM(servo_left_front_leg1, 0, map_angle(60));//turn right 90 degree
-
-     //後ろ右足、前右足
-     //pwm.setPWM(servo_left_front_leg1, 0, map_angle(15));//default
-     //pwm.setPWM(servo_right_back_leg1, 0, map_angle(105));//turn left 90 degree
       
+//here is movement of creepgates
 void loop() {
-  // put your main code here, to run repeatedly:
 
-  front_legs_shrink();
-  front_legs_expand();
-  front_with_back_legs_move();
-  back_legs_shrink();
-  
+delay(3000);
+
+// 動作１
+pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.max_stretch));
+pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.max_stretch)); 
+delay(200);
+pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.upper_limit));
+pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.upper_limit));  
+
+// 動作２
+
+delay(3000);
+pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.beyond_horizontal));
+pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.beyond_horizontal));  
+delay(500);
+
+// 動作３
+
+delay(3000);
+pwm.setPWM(legLB_pin, 0, map_angle(legLB_angle.backward_grounding));
+pwm.setPWM(legRB_pin, 0, map_angle(legRB_angle.backward_grounding));
+delay(200);
+pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.max_stretch));
+pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.max_stretch)); 
+
+// 動作４
+
+delay(3000);
+pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.grounding));
+pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.grounding));     
+delay(1000);
+pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.upward_vertical));
+pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.upward_vertical));   
+delay(1000);
+pwm.setPWM(legLB_pin, 0, map_angle(legLB_angle.horizontal));
+pwm.setPWM(legRB_pin, 0, map_angle(legRB_angle.horizontal));
+delay(1000);
+pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.downward_vertical));
+pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.downward_vertical));     
+
+delay(1000);
 }
 
-void front_with_back_legs_move(){
+void initialize_servo_degree(){
 
-  //前脚をちじめて
-   pwm.setPWM(servo_left_front_leg2, 0, map_angle(10));
-  delay(100);
- pwm.setPWM(servo_right_front_leg2, 0, map_angle(10));
- delay(1000);
+  while(true){
 
- //後ろ脚を伸ばす
-    pwm.setPWM(servo_left_front_leg2, 0, map_angle(10));
-  delay(100);
- pwm.setPWM(servo_right_front_leg2, 0, map_angle(10));
- delay(1000);
+    pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.beyond_downward_vertical));
+    pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.upward_vertical));
+    pwm.setPWM(legLF1_pin, 0, map_angle(legLF1_angle.straight));
 
- 
-}
+    //front right leg state
+    pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.beyond_downward_vertical));     
+    pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.upward_vertical));     
+    pwm.setPWM(legRF1_pin, 0, map_angle(legRF1_angle.straight));
 
+    //back left leg state
+    pwm.setPWM(legLB_pin, 0, map_angle(legLB_angle.horizontal));
+    
+    //back right leg state
+    pwm.setPWM(legRB_pin, 0, map_angle(legRB_angle.horizontal));
 
-void front_legs_shrink(){
+    delay(500);
 
-  //脚を上げて
-   pwm.setPWM(servo_left_front_leg3, 0, map_angle(90));
-  delay(100);
- pwm.setPWM(servo_right_front_leg3, 0, map_angle(90));
- delay(1000);
-
- //脚をちじめて
-   pwm.setPWM(servo_left_front_leg2, 0, map_angle(10));
-  delay(100);
- pwm.setPWM(servo_right_front_leg2, 0, map_angle(10));
- delay(1000);
- 
- //脚を降ろす
-  pwm.setPWM(servo_left_front_leg3, 0, map_angle(160));
-   delay(100);
- pwm.setPWM(servo_right_front_leg3, 0, map_angle(160));
-  delay(1000);
-  
-}
-
-void front_legs_expand(){
-
-    //脚を上げて
-   pwm.setPWM(servo_left_front_leg3, 0, map_angle(90));
-  delay(100);
- pwm.setPWM(servo_right_front_leg3, 0, map_angle(90));
- delay(1000);
-
- //脚を伸ばして
-   pwm.setPWM(servo_left_front_leg2, 0, map_angle(75));
-  delay(100);
- pwm.setPWM(servo_right_front_leg2, 0, map_angle(75));
- delay(1000);
-
- //脚を降ろす
-  pwm.setPWM(servo_left_front_leg3, 0, map_angle(160));
-   delay(100);
- pwm.setPWM(servo_right_front_leg3, 0, map_angle(160));
-  delay(1000);
-  
-}
-
-void back_legs_shrink(){
-
-      //脚を上げて
-   pwm.setPWM(servo_left_back_leg3, 0, map_angle(90));
-  delay(100);
- pwm.setPWM(servo_right_back_leg3, 0, map_angle(90));
- delay(1000);
-
- //脚を伸ばして
-   pwm.setPWM(servo_left_back_leg2, 0, map_angle(10));
-  delay(100);
- pwm.setPWM(servo_right_back_leg2, 0, map_angle(10));
- delay(1000);
-
- //脚を降ろす
-  pwm.setPWM(servo_left_back_leg3, 0, map_angle(160));
-   delay(100);
- pwm.setPWM(servo_right_back_leg3, 0, map_angle(160));
-  delay(1000);
-  
-}
-
-void back_legs_expand(){
-
-      //脚を上げて
-   pwm.setPWM(servo_left_back_leg3, 0, map_angle(90));
-  delay(100);
- pwm.setPWM(servo_right_back_leg3, 0, map_angle(90));
- delay(1000);
-
- //脚を伸ばして
-   pwm.setPWM(servo_left_back_leg2, 0, map_angle(75));
-  delay(100);
- pwm.setPWM(servo_right_back_leg2, 0, map_angle(75));
- delay(1000);
-
- //脚を降ろす
-  pwm.setPWM(servo_left_back_leg3, 0, map_angle(160));
-   delay(100);
- pwm.setPWM(servo_right_back_leg3, 0, map_angle(160));
-  delay(1000);
-  
-}
-
-//////
-void front_legs_move_forward(){
-
-
-
-//前脚を進行方向に、あげて、伸ばしながら、前面におく
-
-//脚を上げる
- pwm.setPWM(servo_left_front_leg3, 0, map_angle(90));
-  delay(100);
- pwm.setPWM(servo_right_front_leg3, 0, map_angle(90));
- delay(1000);
- 
-//脚を前に
- pwm.setPWM(servo_right_front_leg1, 0, map_angle(150));
- delay(100);
- pwm.setPWM(servo_left_front_leg1, 0, map_angle(15));
- delay(1000);
-
-
- //降ろす
- pwm.setPWM(servo_left_front_leg3, 0, map_angle(160));
-   delay(100);
- pwm.setPWM(servo_right_front_leg3, 0, map_angle(160));
-  delay(1000);
-
-
-
-}
-
-void back_legs_move_forward(){
-
-}
-
-void front_legs_move_side(){
-
-   //脚を上げる
-   pwm.setPWM(servo_left_front_leg3, 0, map_angle(90));
-    delay(100);
-   pwm.setPWM(servo_right_front_leg3, 0, map_angle(90));
-   delay(1000);
-
-    //まずは、左右前脚をサイドに90度固定しておく。初期位置とする
-   pwm.setPWM(servo_right_front_leg1, 0, map_angle(60));
-   delay(100);
-   pwm.setPWM(servo_left_front_leg1, 0, map_angle(105));
-   delay(1000);
-  
-   //降ろす
-   pwm.setPWM(servo_left_front_leg3, 0, map_angle(160));
-     delay(100);
-   pwm.setPWM(servo_right_front_leg3, 0, map_angle(160));
-    delay(1000);
-
-}
-
-void back_legs_move_side(){
+  }
 
 }
