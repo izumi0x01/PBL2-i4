@@ -1,4 +1,4 @@
-#include <Wire.h>
+ #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
@@ -70,8 +70,8 @@ front_leg2_servo_angles legRF2_angle  ={0, 45, 75, 135, 150};
 front_leg3_servo_angles legLF3_angle  ={0, 20, 45, 75, 165};
 front_leg3_servo_angles legRF3_angle  ={0, 20, 45, 75, 165};
 
-back_leg_servo_angles legLB_angle  ={130, 100, 85, 10, 0};//default
-back_leg_servo_angles legRB_angle  ={35, 65, 80, 155, 165};
+back_leg_servo_angles legLB_angle  ={0, 65, 80, 155, 165};//default
+back_leg_servo_angles legRB_angle  ={165, 100, 85, 10, 0};
 
 
 void setup() {
@@ -90,51 +90,54 @@ void loop() {
 
 // 動作１
 
-delay(1000);
+delay(5000);
+//  pwm.setPWM(legLB_pin, 0, map_angle(legLB_angle.backward_grounding));
+//  pwm.setPWM(legRB_pin, 0, map_angle(legRB_angle.backward_grounding));
+//pwm.setPWM(legLB_pin, 0, map_angle(legLB_angle.diagonal));
+//pwm.setPWM(legRB_pin, 0, map_angle(legRB_angle.diagonal));
+delay(100);
+
 pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.horizontal));
 pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.horizontal)); 
 delay(100);
 pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.upper_limit));
-pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.upper_limit));  
+pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.upper_limit));
+
 
 // 動作２
 
 delay(1000);
-pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.beyond_horizontal));
-pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.beyond_horizontal));  
+pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.horizontal));
+pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.horizontal)); 
 delay(100);
-pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.lower_horizontal));
-pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.lower_horizontal)); 
+pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.horizontal));
+pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.horizontal));  
 
 // 動作３
 
-delay(1000);
-pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.horizontal));
-pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.horizontal));  
+ delay(100);
+// pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.beyond_upward_vertical));
+// pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.beyond_upward_vertical));  
+//  delay(100);
+pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.frontward_vertical));
+pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.frontward_vertical)); 
+
 delay(100);
-pwm.setPWM(legLB_pin, 0, map_angle(legLB_angle.backward_grounding));
-pwm.setPWM(legRB_pin, 0, map_angle(legRB_angle.backward_grounding));
-delay(100);
-pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.diagonal));
-pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.diagonal)); 
+pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.beyond_horizontal));
+pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.beyond_horizontal));  
 
 
 // 動作４
 
 delay(1000);
-pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.beyond_upward_vertical));
-pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.beyond_upward_vertical));  
-delay(500);
+
 pwm.setPWM(legLF3_pin, 0, map_angle(legLF3_angle.downward_grounding));
 pwm.setPWM(legRF3_pin, 0, map_angle(legRF3_angle.downward_grounding));    
 delay(500);
-pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.upward_vertical));
-pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.upward_vertical));   
-delay(500);
-//pwm.setPWM(legLB_pin, 0, map_angle(legLB_angle.horizontal));
-//pwm.setPWM(legRB_pin, 0, map_angle(legRB_angle.horizontal));
 
-//delay(1000);
+pwm.setPWM(legLF2_pin, 0, map_angle(legLF2_angle.upward_vertical));
+pwm.setPWM(legRF2_pin, 0, map_angle(legRF2_angle.upward_vertical));  
+// //delay(1000);
 }
 
 void initialize_servo_degree(){
